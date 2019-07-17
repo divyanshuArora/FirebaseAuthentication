@@ -1,0 +1,81 @@
+package app.gobusiness.com.remindernotificationdivyanshu;
+
+import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.LauncherActivity;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.TimePickerDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.v4.app.NotificationCompat;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.TimePicker;
+import android.widget.Toast;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ItemViewHolder> {
+
+
+    private static final String TAG = "TAG";
+    List<ReminderModel> reminderModelList = new ArrayList<>();
+    Context context;
+    Database_Helper database_helper;
+    long dateSet;
+    int rerminder_id;
+    Calendar calendar = Calendar.getInstance();
+    TimePickerDialog timePickerDialog;
+
+    int day = calendar.get(Calendar.DATE);
+    int month = calendar.get(Calendar.MONTH);
+    int mYear = calendar.get(Calendar.YEAR);
+     String deleteItem;
+
+
+    public ReminderAdapter(Context context,List<ReminderModel> reminderModelList) {
+        this.reminderModelList = reminderModelList;
+        this.context = context;
+    }
+
+    @NonNull
+    @Override
+    public ReminderAdapter.ItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+
+        LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
+        View view = inflater.inflate(R.layout.reminder_show_item,viewGroup,false);
+
+        return new ItemViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(final ReminderAdapter.ItemViewHolder itemViewHolder,final int i) {
+
+        itemViewHolder.title_show.setText("Title: "+reminderModelList.get(i).getTitle());
+        itemViewHolder.desc_show.setText("Description: "+reminderMode
