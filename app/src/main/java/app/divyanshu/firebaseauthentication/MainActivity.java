@@ -68,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
     String imageSuccess;
     DatabaseReference databaseReference;
 
+     ProgressDialog pg;
+
            FirebaseStorage storage;
         StorageReference storageRef;
         StorageReference mountainImagesRef;
@@ -78,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         firebaseAuth = FirebaseAuth.getInstance();
-
+        pg= new ProgressDialog(MainActivity.this);
         storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
         mountainImagesRef = storageRef.child("images/");
@@ -121,8 +123,9 @@ public class MainActivity extends AppCompatActivity {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                         requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_REQUEST_CAMERA);
+
                     } else {
-                        Toast.makeText(MainActivity.this, "Permission Granted", Toast.LENGTH_SHORT).show();
+
                         Intent intent = new Intent(Intent.ACTION_PICK);
                         intent.setType("image/");
                         startActivityForResult(intent, 0);
@@ -233,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        final ProgressDialog pg = new ProgressDialog(MainActivity.this);
+
         pg.setTitle("Registring");
         pg.setMessage("Loading");
         pg.setCancelable(false);
@@ -249,12 +252,11 @@ public class MainActivity extends AppCompatActivity {
 
 
                             Toast.makeText(MainActivity.this, "Registration UnSuccessful", Toast.LENGTH_SHORT).show();
-                            pg.dismiss();
+
                         } else
                             {
                                 Log.e("Main", "onCompleteSuccess: " );
                                 uploadImageToFirebase();
-                                pg.dismiss();
                             }
                     }
                 }); }
@@ -264,7 +266,7 @@ public class MainActivity extends AppCompatActivity {
                 private void uploadImageToFirebase()
                 {
 
-                    String uid = firebaseAuth.getCurrentUser().getUid().toString();
+                    String uid = firebaseAuth.getCurrentUser().getUid();
 
                     StorageReference storageRef = storage.getReference();
                     final StorageReference mountainImagesRef = storageRef.child("images/"+uid);
@@ -299,86 +301,43 @@ public class MainActivity extends AppCompatActivity {
 
                                     updateTheDatabase(name1, email1, number1, pass1, gender, filePath,user_id);
                                     Toast.makeText(MainActivity.this, "registration Successfull", Toast.LENGTH_SHORT).show();
+                                    pg.dismiss();
                                 }
-                            });
 
-                        }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.e("Main", "onFailure: " +e);
+                                    pg.dismiss();
+                                }
+                            }); }
                     });
-
-
                 }
 
-//    private void imageUpload()
-//    {
-//
-//        Log.e("Main", "imageUpload: ");
-//        int uid= (int)System.currentTimeMillis();
-//        final StorageReference   uploadRef = FirebaseStorage.getInstance().getReference("/image/"+uid+".png");
-//        uploadRef.putFile(Picuri).addOnFailureListener(new OnFailureListener() {
-//            @Override
-//            public void onFailure(@NonNull Exception e)
-//            {
-//                Log.e("Main Activity", "onFailure: "+e);
-//            }
-//        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-//            @Override
-//            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot)
-//            {
-//                Log.e("Main Activity", "onSuccess: "+taskSnapshot.getMetadata().getPath());
-//
-//
-//                Task<Uri> task = taskSnapshot.getMetadata().getReference().getDownloadUrl();
-//                Log.e("Main Activity", "task: "+task);
-//                task.addOnSuccessListener(new OnSuccessListener<Uri>() {
-//                    @Override
-//                    public void onSuccess(Uri uri)
-//                    {
-//                        Log.e("Main Activity", "URI: "+uri);
-//                    imageSuccess = uri.toString();
-//                    }
-//                }).addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//
-//                    }
-//                });
-//
-//
-//
-//                Log.e("imageSuccess", "onSuccess: "+imageSuccess);
-//
-//                Intent x = new Intent(getApplicationContext(), Login.class);
-//                startActivity(x);
-//                FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-//                String user_id = firebaseUser.getUid();
-//
-//                updateTheDatabase(name1, email1, number1, pass1, gender, imageSuccess,user_id);
-//                Toast.makeText(MainActivity.this, "registration Successfull", Toast.LENGTH_SHORT).show();
-//
-//
-//            }
-//        });
-//
-//
-//    }
+
 
     private void updateTheDatabase(final String registeredName, final String registeredEmail, final String registeredNumber, final String registeredPassword, final String radioGender,final String storedImageName,String user_id
     ) {
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("/users").child(registeredNumber);
-        UserModel model = new UserModel(registeredName, registeredEmail, registeredNumber, registeredPassword, radioGender,storedImageName,user_id);
+        UserModel model = new UserModel(registeredEmail, registeredName, registeredNumber, registeredPassword, radioGender,storedImageName,user_id);
         databaseReference.setValue(model).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(Task<Void> task) {
                 Intent x = new Intent(MainActivity.this, Login.class);
-                x.putExtra("name", registeredName);
-                x.putExtra("email", registeredEmail);
-                x.putExtra("number", registeredNumber);
-                x.putExtra("password", registeredPassword);
-                x.putExtra("gender", radioGender);
-                x.putExtra("StoredImageName",storedImageName);
-                //     x.putExtra("email",user_id);
+//                x.putExtra("name", registeredName);
+//                x.putExtra("email", registeredEmail);
+//                x.putExtra("number", registeredNumber);
+//                x.putExtra("password", registeredPassword);
+//                x.putExtra("gender", radioGender);
+//                x.putExtra("StoredImageName",storedImageName);
+//                //     x.putExtra("email",user_id);
 
                 startActivity(x);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e("Register", "onFailure: "+"not registered" );
             }
         });
 

@@ -8,7 +8,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -22,6 +21,8 @@ public class Login extends AppCompatActivity {
     String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
     FirebaseAuth auth;
     SessionManager sessionManager;
+    ProgressDialog pg;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,7 +31,7 @@ public class Login extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         sessionManager = new SessionManager(Login.this);
 
-
+        pg= new ProgressDialog(Login.this);
       checkSession();
 
 
@@ -84,7 +85,6 @@ public class Login extends AppCompatActivity {
 
     private void forgotMethod(String emailForgot)
     {
-        final ProgressDialog pg = new ProgressDialog(Login.this);
         pg.setTitle("Registring");
         pg.setMessage("Loading");
         pg.setCancelable(false);
@@ -97,12 +97,12 @@ public class Login extends AppCompatActivity {
              if (!task.isSuccessful())
              {
                  Toast.makeText(Login.this, "Email Is Not Registered", Toast.LENGTH_SHORT).show();
-                 pg.dismiss();
+
              }
              else
              {
                  Toast.makeText(Login.this, "Reset Link Sent On Your Email", Toast.LENGTH_SHORT).show();
-                 pg.dismiss();
+
              }
             }
         });

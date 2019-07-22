@@ -1,19 +1,10 @@
 package app.divyanshu.firebaseauthentication;
 
+import com.google.firebase.database.Exclude;
+
 public class UserModel {
 
-    public UserModel( String name,String email,String number,String gender) {
-        this.email = email;
-        this.name = name;
-        this.email = email;
-        this.number = number;
-        this.gender = gender;
-    }
 
-    public UserModel()
-    {
-
-    }
 
     public UserModel(String email, String name, String number, String password, String gender,String StoredImageName,String user_id) {
         this.email = email;
@@ -34,19 +25,23 @@ public class UserModel {
         this.email = email;
     }
 
-    String email;
-    String name;
-    String number;
-    String password;
-    String gender;
+   private   String email;
+    private  String name;
+    private String number;
+    private String password;
+    private  String gender;
 
+    @Exclude
+    public String getStoredImageName() {
+        return StoredImageName;
+    }
 
+    @Exclude
+    public void setStoredImageName(String storedImageName) {
+        StoredImageName = storedImageName;
+    }
 
-    String StoredImageName ;
-
-
-
-
+    String StoredImageName;
 
     public String getUser_id() {
         return user_id;
